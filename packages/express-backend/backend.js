@@ -34,15 +34,28 @@ const users = {users_list: [
   ]
 };
 
+function generateId(){
+    return Math.floor(Math.random() * 10000); // random between 0 - 9999
+}
+
 const addUser = (user) => {
+    user.id = generateId();
     users["users_list"].push(user);
     return user;
 };
 
+// returns Id if deleted, 0 if not found
 const removeUser = (userId) => {
+    let numUsers = users.users_list.length;
     users.users_list = users.users_list.filter((user, i) => {
         return user.id != userId;
     });
+
+    if (users.users_list.length < numUsers) {
+        return userId;
+    }
+
+    return 0;
 }
 
 const findUserByName = (list, name) => {
@@ -95,14 +108,18 @@ app.get("/users/:id", (req, res) => {
 
 app.post("/users", (req, res) => {
     const userToAdd = req.body;
-    addUser(userToAdd);
-    res.send();
+    let addedUser = addUser(userToAdd);
+    res.status(201).send(addedUser);
 });
 
 app.delete("/users/:id", (req, res) => {
     const id = req.params.id;
-    removeUser(id);
-    res.send();
+    let removeId = removeUser(id);
+    if (removeId === 0) {
+        res.status(404).send(); // not found
+    } else {
+        res.status(204).send(); // success
+    }
 });
 
 app.listen(port, () => {

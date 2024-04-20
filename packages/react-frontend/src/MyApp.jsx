@@ -12,6 +12,11 @@ function MyApp() {
       .catch((error) => { console.log(error); });
   }, [] );
 
+  function fetchUsers() {
+    const promise = fetch("http://localhost:8000/users");
+    return promise;
+  }
+
   function postUser(person) {
     const promise = fetch("http://localhost:8000/users", {
       method: "POST",
@@ -24,26 +29,43 @@ function MyApp() {
     return promise;
   }
 
-  function removeOneCharacter(index) {
-    const updated = characters.filter((character, i) => {
-      return i !== index;
+  function removeUser(id) {
+    const promise = fetch(`http://localhost:8000/users/${id}`, {
+      method: "DELETE",
     });
-    setCharacters(updated);
+
+    return promise;
+  }
+
+  function removeOneCharacter(index) {
+    let removeId = characters[index].id;
+    removeUser(removeId)
+      .then((response) => {
+        if (response.status !== 204) {
+          throw new Error("Delete failed with status " + response.status);
+        } else {
+          const updated = characters.filter((character) => {
+            return character.id !== removeId;
+          });
+          setCharacters(updated);
+        }
+      })
   }
 
   function updateList(person) {
     postUser(person)
-      .then(() => setCharacters([...characters, person]))
+      .then((response) => {
+        if (response.status !== 201) {
+          throw new Error("Request failed with status " + response.status);
+        } else {
+          return response.json();
+        }})
+      .then((json) => setCharacters([...characters, json]))
       .catch((error) => {
           console.log(error);
       })
 
       // Should there be a semicolon on the line above this?
-  }
-
-  function fetchUsers() {
-    const promise = fetch("http://localhost:8000/users");
-    return promise;
   }
 
   return (
