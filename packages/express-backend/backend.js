@@ -1,9 +1,14 @@
 import express from "express";
 import cors from "cors";
 
+import userService from "./services/user-service.js";
+
 
 const app = express();
 const port = 8000;
+
+app.use(cors());
+app.use(express.json());
 
 const users = {users_list: [
     {
@@ -73,8 +78,6 @@ const findUserByJob = (list, job) => {
 const findUserById = (id) =>
     users["users_list"].find((user) => user["id"] === id);
 
-app.use(cors());
-app.use(express.json());
 
 app.get("/", (req, res) => {
     res.send("Hello World!");
