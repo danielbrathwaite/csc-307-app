@@ -38,14 +38,14 @@ function MyApp() {
   }
 
   function removeOneCharacter(index) {
-    let removeId = characters[index].id;
+    let removeId = characters[index]._id;
     removeUser(removeId)
       .then((response) => {
         if (response.status !== 204) {
           throw new Error("Delete failed with status " + response.status);
         } else {
           const updated = characters.filter((character) => {
-            return character.id !== removeId;
+            return character._id !== removeId;
           });
           setCharacters(updated);
         }
